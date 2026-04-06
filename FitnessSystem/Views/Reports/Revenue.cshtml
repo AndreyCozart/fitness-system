@@ -1,0 +1,142 @@
+﻿@model FitnessSystem.Models.RevenueReportViewModel
+
+@{
+    ViewData["Title"] = "Отчет по выручке";
+}
+
+<h1>Отчет по выручке</h1>
+
+<div class="card mb-4">
+    <div class="card-header bg-primary text-white">
+        <h5 class="mb-0">Параметры отчета</h5>
+    </div>
+    <div class="card-body">
+        <form method="get" class="row">
+            <div class="col-md-4">
+                <label class="form-label">Дата начала</label>
+                <input type="date" name="startDate" class="form-control" value="@Model.StartDate.ToString("yyyy-MM-dd")" />
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">Дата окончания</label>
+                <input type="date" name="endDate" class="form-control" value="@Model.EndDate.ToString("yyyy-MM-dd")" />
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">&nbsp;</label>
+                <button type="submit" class="btn btn-primary d-block">Сформировать отчет</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header bg-success text-white">
+                <h5 class="mb-0">Общая статистика</h5>
+            </div>
+            <div class="card-body">
+                <p><strong>Период:</strong> @Model.StartDate.ToShortDateString() - @Model.EndDate.ToShortDateString()</p>
+                <p><strong>Общая выручка:</strong> <span class="fw-bold fs-4 text-success">@Model.TotalRevenue.ToString("N0") ₽</span></p>
+                <p><strong>Количество проданных абонементов:</strong> @Model.RevenueByMembershipType.Values.Count</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header bg-info text-white">
+                <h5 class="mb-0">Распределение по типам</h5>
+            </div>
+            <div class="card-body">
+                <canvas id="revenueChart" style="max-height: 300px;"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header bg-primary text-white">
+        <h5 class="mb-0">Детализация по типам абонементов</h5>
+    </div>
+    <div class="card-body">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Тип абонемента</th>
+                    <th>Количество</th>
+                    <th>Сумма</th>
+                </tr>
+            </thead>
+            <tbody>
+                @{
+                    var totalCount = 0;
+                    var totalSum = 0m;
+                }
+                @foreach (var item in Model.RevenueByMembershipType)
+                {
+                    var count = Model.RevenueByMembershipType.Where(x => x.Key == item.Key).Count();
+                    totalCount += count;
+                    totalSum += item.Value;
+                    <tr>
+                        <td>@item.Key</td>
+                        <td>@count</td>
+                        <td>@item.Value.ToString("N0") ₽</td>
+                    </tr>
+                }
+            </tbody>
+            <tfoot class="table-primary">
+                <tr>
+                    <th>Итого:</th>
+                    <th>@totalCount</th>
+                    <th>@totalSum.ToString("N0") ₽</th>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+</div>
+
+<div class="mt-3">
+    <a asp-action="Index" class="btn btn-secondary">Назад к отчетам</a>
+    <button onclick="window.print()" class="btn btn-outline-primary">
+        <i class="bi bi-printer"></i> Печать
+    </button>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const ctx = document.getElementById('revenueChart').getContext('2d');
+
+            const labels = @Html.Raw(Json.Serialize(Model.RevenueByMembershipType.Keys));
+            const data = @Html.Raw(Json.Serialize(Model.RevenueByMembershipType.Values));
+
+            new Chart(ctx, {
+                type: 'pie',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        data: data,
+                        backgroundColor: [
+                            'rgba(255, 99, 132, 0.8)',
+                            'rgba(54, 162, 235, 0.8)',
+                            'rgba(255, 206, 86, 0.8)',
+                            'rgba(75, 192, 192, 0.8)',
+                            'rgba(153, 102, 255, 0.8)',
+                            'rgba(255, 159, 64, 0.8)',
+                            'rgba(199, 199, 199, 0.8)'
+                        ]
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+        });
+    </script>
+}
