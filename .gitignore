@@ -2,19 +2,36 @@
 .vs/
 *.user
 *.suo
+*.userosscache
+*.sln.docstates
 
-# Build output
-bin/
-obj/
+# Build results
+[Dd]ebug/
+[Dd]ebugPublic/
+[Rr]elease/
+[Rr]eleases/
+x64/
+x86/
+[Aa]pp_Data/
+bld/
+[Bb]in/
+[Oo]bj/
+[Ll]og/
 
-# Локальная БД
-*.db
+# Database files (ВАЖНО!)
 *.mdf
 *.ldf
+*.sqlite
+*.db
 
-# Секреты
+# User-specific files
 appsettings.Development.json
 
-# OS
-.DS_Store
-Thumbs.db
+# NuGet
+*.nupkg
+**/packages/*
+!**/packages/build/
+
+# Other
+*.cache
+*.log
