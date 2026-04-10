@@ -1,0 +1,30 @@
+﻿@{
+    ViewData["Title"] = "Отметка входа";
+}
+
+<h1>Отметка входа</h1>
+
+<hr />
+<div class="row">
+    <div class="col-md-6">
+        <form asp-action="CheckIn">
+            <div class="form-group mb-3">
+                <label for="clientId" class="control-label">Выберите клиента</label>
+                <select name="clientId" class="form-control" asp-items="ViewBag.Clients">
+                    <option value="">-- Выберите клиента --</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <input type="submit" value="Отметить вход" class="btn btn-primary" />
+                <a asp-action="Index" class="btn btn-secondary">Назад</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

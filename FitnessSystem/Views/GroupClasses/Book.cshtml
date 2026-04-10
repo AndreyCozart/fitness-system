@@ -1,0 +1,80 @@
+﻿@model FitnessSystem.Models.GroupClassBooking
+@{
+    ViewData["Title"] = "Запись на занятие";
+    var groupClass = ViewBag.GroupClass as FitnessSystem.Models.GroupClass;
+    var clients = ViewBag.Clients as IEnumerable<SelectListItem>;
+}
+
+<h1>Запись на групповое занятие</h1>
+
+@if (groupClass != null)
+{
+    <div class="card mb-4">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0">@groupClass.Name</h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <p><strong><i class="bi bi-person"></i> Инструктор:</strong> @groupClass.Instructor</p>
+                    <p><strong><i class="bi bi-clock"></i> Время:</strong> @groupClass.StartTime.ToString(@"hh\:mm") - @groupClass.EndTime.ToString(@"hh\:mm")</p>
+                </div>
+                <div class="col-md-6">
+                    <p><strong><i class="bi bi-door-open"></i> Зал:</strong> @groupClass.Room</p>
+                    <p><strong><i class="bi bi-people"></i> Макс. участников:</strong> @groupClass.MaxParticipants</p>
+                </div>
+            </div>
+            @if (!string.IsNullOrEmpty(groupClass.Description))
+            {
+                <p><strong>Описание:</strong> @groupClass.Description</p>
+            }
+        </div>
+    </div>
+
+    <form asp-action="Book" method="post">
+        <input type="hidden" name="groupClassId" value="@groupClass.Id" />
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group mb-3">
+                    <label for="clientId" class="form-label fw-bold">Выберите клиента</label>
+                    <select name="clientId" class="form-control" required>
+                        <option value="">-- Выберите клиента --</option>
+                        @if (clients != null)
+                        {
+                            foreach (var client in clients)
+                            {
+                                <option value="@client.Value">@client.Text</option>
+                            }
+                        }
+                    </select>
+                </div>
+
+                <div class="form-group mb-3">
+                    <label for="classDate" class="form-label fw-bold">Дата занятия</label>
+                    <input type="date" name="classDate" class="form-control"
+                           value="@DateTime.Today.AddDays(1).ToString("yyyy-MM-dd")"
+                           min="@DateTime.Today.ToString("yyyy-MM-dd")" required />
+                </div>
+
+                <div class="form-group mt-4">
+                    <button type="submit" class="btn btn-success">
+                        <i class="bi bi-check-circle"></i> Записаться
+                    </button>
+                    <a asp-action="Schedule" class="btn btn-secondary">
+                        <i class="bi bi-arrow-left"></i> Назад к расписанию
+                    </a>
+                </div>
+            </div>
+        </div>
+    </form>
+}
+else
+{
+    <div class="alert alert-danger">
+        <i class="bi bi-exclamation-triangle"></i> Занятие не найдено.
+    </div>
+    <a asp-action="Schedule" class="btn btn-secondary">
+        <i class="bi bi-arrow-left"></i> Назад к расписанию
+    </a>
+}

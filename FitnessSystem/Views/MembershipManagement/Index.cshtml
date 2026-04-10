@@ -1,0 +1,241 @@
+﻿@{
+    ViewData["Title"] = "Управление абонементами";
+    var membershipTypes = ViewBag.MembershipTypes as List<FitnessSystem.Models.MembershipType>;
+    var memberships = ViewBag.Memberships as List<FitnessSystem.Models.Membership>;
+}
+
+<h1>Управление абонементами</h1>
+
+<!-- Вкладки -->
+<ul class="nav nav-tabs mb-4" id="membershipTabs" role="tablist">
+    <li class="nav-item" role="presentation">
+        <button class="nav-link active" id="types-tab" data-bs-toggle="tab" data-bs-target="#types" type="button" role="tab">
+            <i class="bi bi-tags"></i> Типы абонементов
+        </button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="memberships-tab" data-bs-toggle="tab" data-bs-target="#memberships" type="button" role="tab">
+            <i class="bi bi-ticket-perforated"></i> Абонементы клиентов
+        </button>
+    </li>
+</ul>
+
+<div class="tab-content" id="membershipTabsContent">
+    <!-- Вкладка "Типы абонементов" -->
+    <div class="tab-pane fade show active" id="types" role="tabpanel">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h3>Типы абонементов</h3>
+            <a asp-action="CreateType" class="btn btn-primary">
+                <i class="bi bi-plus-circle"></i> Добавить тип
+            </a>
+        </div>
+
+        @if (membershipTypes != null && membershipTypes.Any())
+        {
+            <div class="table-responsive">
+                <table class="table table-striped table-hover">
+                    <thead class="table-primary">
+                        <tr>
+                            <th>Название</th>
+                            <th>Посещений</th>
+                            <th>Срок (дн.)</th>
+                            <th>Цена</th>
+                            <th>Статус</th>
+                            <th>Действия</th>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in membershipTypes)
+                        {
+                            <tr>
+                                <td class="fw-bold">@item.TypeName</td>
+                                <td>@(item.VisitsCount.HasValue? item.VisitsCount.ToString() : "Безлимитный")</td>
+                                <td>@item.DurationDays</td>
+                                <td class="text-success fw-bold">@item.Price.ToString("N0") ₽</td>
+                                <td>
+                                    @if (item.IsActive)
+                                    {
+                                        <span class="badge bg-success">Активен</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-secondary">Неактивен</span>
+                                    }
+                                </td>
+                                <td>
+                                    <div class="btn-group" role="group">
+                                        <a asp-action="EditType" asp-route-id="@item.Id" class="btn btn-sm btn-warning" title="Редактировать">
+                                            <i class="bi bi-pencil"></i>
+                                        </a>
+                                        <a asp-action="DeleteType" asp-route-id="@item.Id" class="btn btn-sm btn-danger" title="Удалить">
+                                            <i class="bi bi-trash"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+        else
+        {
+            <div class="alert alert-info">
+                <i class="bi bi-info-circle"></i> Нет типов абонементов. Добавьте первый тип!
+            </div>
+        }
+    </div>
+
+    <!-- Вкладка "Абонементы клиентов" -->
+    <div class="tab-pane fade" id="memberships" role="tabpanel">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h3>Абонементы клиентов</h3>
+            <a asp-action="CreateMembership" class="btn btn-success">
+                <i class="bi bi-plus-circle"></i> Продать абонемент
+            </a>
+        </div>
+
+        @if (memberships != null && memberships.Any())
+        {
+            <div class="table-responsive">
+                <table class="table table-striped table-hover">
+                    <thead class="table-primary">
+                        <tr>
+                            <th>Клиент</th>
+                            <th>Тип абонемента</th>
+                            <th>Дата покупки</th>
+                            <th>Дата начала</th>
+                            <th>Дата окончания</th>
+                            <th>Осталось</th>
+                            <th>Статус</th>
+                            <th>Действия</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in memberships)
+                        {
+                            <tr>
+                                <td>
+                                    <a asp-controller="Clients" asp-action="Details" asp-route-id="@item.ClientId" class="fw-bold">
+                                        @(item.Client?.LastName ?? "Н/Д") @(item.Client?.FirstName ?? "")
+                                    </a>
+                                </td>
+                                <td>@(item.Type?.TypeName ?? "Н/Д")</td>
+                                <td>@item.PurchaseDate.ToShortDateString()</td>
+                                <td>@item.StartDate.ToShortDateString()</td>
+                                <td>@item.EndDate.ToShortDateString()</td>
+                                <td>
+                                    @if (item.VisitsRemaining >= 0)
+                                    {
+                                        @item.VisitsRemaining
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-info">Безлимитный</span>
+                                    }
+                                </td>
+                                <td>
+                                    @{
+                                        var daysLeft = (item.EndDate - DateTime.Today).Days;
+                                        var isActive = item.Status == "active" && item.EndDate >= DateTime.Today;
+                                    }
+                                    @if (isActive)
+                                    {
+                                        <span class="badge bg-success">Активный</span>
+                                        if (daysLeft <= 7)
+                                        {
+                                            <br />
+                            
+                                            <small class="text-warning">Истекает через @daysLeft дн.</small>
+                                        }
+                                    }
+                                    else if (item.Status == "frozen")
+                                    {
+                                        <span class="badge bg-warning">Заморожен</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-danger">Истек</span>
+                                    }
+                                </td>
+                                <td>
+                                    <div class="btn-group" role="group">
+                                        <a asp-action="DetailsMembership" asp-route-id="@item.Id" class="btn btn-sm btn-info" title="Просмотр">
+                                            <i class="bi bi-eye"></i>
+                                        </a>
+                                        @if (isActive)
+                                        {
+                                            <button type="button" class="btn btn-sm btn-warning"
+                                                    data-bs-toggle="modal" data-bs-target="#freezeModal-@item.Id"
+                                                    title="Заморозить">
+                                                <i class="bi bi-snow"></i>
+                                            </button>
+                                        }
+                                        else if (item.Status == "frozen")
+                                        {
+                                            <form asp-action="UnfreezeMembership" asp-route-id="@item.Id" method="post" style="display: inline;">
+                                                @Html.AntiForgeryToken()
+                                                <button type="submit" class="btn btn-sm btn-success" title="Разморозить">
+                                                    <i class="bi bi-snow2"></i>
+                                                </button>
+                                            </form>
+                                        }
+                                    </div>
+
+                                    <!-- Modal for freeze -->
+                                    <div class="modal fade" id="freezeModal-@item.Id" tabindex="-1">
+                                        <div class="modal-dialog">
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                    <h5 class="modal-title">Заморозка абонемента</h5>
+                                                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                                </div>
+                                                <form asp-action="FreezeMembership" asp-route-id="@item.Id" method="post">
+                                                    @Html.AntiForgeryToken()
+                                                    <div class="modal-body">
+                                                        <div class="form-group">
+                                                            <label for="freezeDays">Количество дней заморозки:</label>
+                                                            <input type="number" name="freezeDays" class="form-control"
+                                                                   min="1" max="30" value="7" required />
+                                                        </div>
+                                                    </div>
+                                                    <div class="modal-footer">
+                                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+                                                        <button type="submit" class="btn btn-warning">Заморозить</button>
+                                                    </div>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+        else
+        {
+            <div class="alert alert-info">
+                <i class="bi bi-info-circle"></i> Нет абонементов. Продайте первый абонемент!
+            </div>
+        }
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Сохраняем активную вкладку после перезагрузки
+        var activeTab = localStorage.getItem('activeMembershipTab');
+        if (activeTab) {
+            var tabTrigger = new bootstrap.Tab(document.querySelector(activeTab));
+            tabTrigger.show();
+        }
+
+        // Сохраняем активную вкладку при клике
+        document.querySelectorAll('#membershipTabs button').forEach(tab => {
+            tab.addEventListener('shown.bs.tab', function (e) {
+                localStorage.setItem('activeMembershipTab', '#' + e.target.getAttribute('data-bs-target'));
+            });
+        });
+    </script>
+}

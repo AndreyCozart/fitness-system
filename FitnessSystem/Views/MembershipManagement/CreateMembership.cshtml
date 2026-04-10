@@ -1,0 +1,155 @@
+﻿@{
+    ViewData["Title"] = "Продажа абонемента";
+    var clientId = ViewBag.SelectedClientId;
+    var clientName = ViewBag.ClientName;
+    var membershipTypes = ViewBag.MembershipTypes as List<FitnessSystem.Models.MembershipType>;
+    var clients = ViewBag.Clients as Microsoft.AspNetCore.Mvc.Rendering.SelectList;
+}
+
+<h1>Продажа абонемента</h1>
+
+@if (clientId != null)
+{
+    <div class="alert alert-info">
+        <i class="bi bi-info-circle"></i> Оформление абонемента для клиента: <strong>@clientName</strong>
+    </div>
+}
+
+<hr />
+<div class="row">
+    <div class="col-md-6">
+        <form asp-action="CreateMembership" method="post">
+            <div class="form-group mb-3">
+                <label class="control-label fw-bold">
+                    <i class="bi bi-person"></i> Выберите клиента
+                </label>
+                <select name="clientId" class="form-control" required>
+                    <option value="">-- Выберите клиента --</option>
+                    @if (clients != null)
+                    {
+                        foreach (var client in clients)
+                        {
+                            if (clientId != null && client.Value != null && client.Value.ToString() == clientId.ToString())
+                            {
+                                <option value="@client.Value" selected>@client.Text</option>
+                            }
+                            else
+                            {
+                                <option value="@client.Value">@client.Text</option>
+                            }
+                        }
+                    }
+                </select>
+            </div>
+
+            <div class="form-group mb-3">
+                <label class="control-label fw-bold">
+                    <i class="bi bi-ticket-perforated"></i> Выберите тип абонемента
+                </label>
+                <select name="typeId" class="form-control" required>
+                    <option value="">-- Выберите тип абонемента --</option>
+                    @if (membershipTypes != null)
+                    {
+                        foreach (var type in membershipTypes)
+                        {
+                            <option value="@type.Id">
+                                @type.TypeName - @type.Price.ToString("N0") ₽
+                                (@(type.VisitsCount.HasValue? type.VisitsCount + " посещений" : "Безлимитный"), @type.DurationDays дн.)
+                            </option>
+                        }
+                    }
+                </select>
+            </div>
+
+            <div class="form-group mt-4">
+                <button type="submit" class="btn btn-success btn-lg">
+                    <i class="bi bi-check-circle"></i> Оформить абонемент
+                </button>
+                <a asp-action="Index" class="btn btn-secondary btn-lg">
+                    <i class="bi bi-arrow-left"></i> Отмена
+                </a>
+            </div>
+        </form>
+    </div>
+
+    <div class="col-md-6">
+        <div class="card bg-light">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0"><i class="bi bi-info-circle"></i> Информация</h5>
+            </div>
+            <div class="card-body">
+                <p class="text-muted mb-2">
+                    <i class="bi bi-lightbulb"></i> После оформления абонемента:
+                </p>
+                <ul class="small">
+                    <li>Абонемент активируется с текущей даты</li>
+                    <li>Срок действия рассчитывается автоматически</li>
+                    <li>Количество посещений зависит от выбранного типа</li>
+                    <li>Абонемент можно будет заморозить при необходимости</li>
+                </ul>
+                <hr />
+                <p class="mb-0 text-muted small">
+                    <i class="bi bi-question-circle"></i> Возникли вопросы? Обратитесь к администратору.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="mt-5">
+    <h5 class="text-primary">
+        <i class="bi bi-list-ul"></i> Доступные типы абонементов:
+    </h5>
+    <div class="table-responsive">
+        <table class="table table-striped table-hover">
+            <thead class="table-primary">
+                <tr>
+                    <th>Тип абонемента</th>
+                    <th>Количество посещений</th>
+                    <th>Срок действия</th>
+                    <th>Цена</th>
+                    <th>Описание</th>
+            </thead>
+            <tbody>
+                @if (membershipTypes != null && membershipTypes.Any())
+                {
+                    foreach (var type in membershipTypes)
+                    {
+                        <tr>
+                            <td class="fw-bold">@type.TypeName</td>
+                            <td>@(type.VisitsCount.HasValue? type.VisitsCount.ToString() : "Безлимитный")</td>
+                            <td>@type.DurationDays дней</td>
+                            <td class="fw-bold text-success">@type.Price.ToString("N0") ₽</td>
+                            <td>@type.Description</td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="5" class="text-center text-warning">
+                            <i class="bi bi-exclamation-triangle"></i> Нет активных типов абонементов
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Если есть выбранный клиент, автоматически выбираем его в списке
+        @if (clientId != null)
+        {
+                <text>
+                document.addEventListener('DOMContentLoaded', function() {
+                    var select = document.querySelector('select[name="clientId"]');
+                    if (select) {
+                        select.value = '@clientId';
+                    }
+                });
+                </text>
+        }
+    </script>
+}

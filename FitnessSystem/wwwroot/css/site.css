@@ -1,0 +1,113 @@
+/* Стили для карточек адресов */
+.address-card {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    border-left: 4px solid #2a5298;
+    border-radius: 8px;
+    padding: 15px;
+    height: 100%;
+    transition: transform 0.3s;
+}
+
+    .address-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+
+    .address-card i {
+        color: #2a5298;
+        font-size: 1.5rem;
+        margin-right: 10px;
+    }
+
+.address-title {
+    font-weight: 700;
+    color: #1e3c72;
+    margin-bottom: 5px;
+    font-size: 1.1rem;
+}
+
+.address-detail {
+    color: #6c757d;
+    font-size: 0.9rem;
+    margin-left: 0;
+    padding-left: 0;
+}
+
+    .address-detail i {
+        font-size: 0.9rem;
+        margin-right: 5px;
+        color: #6c757d;
+    }
+
+/* Стили для новостей */
+.news-item {
+    border-bottom: 1px solid #dee2e6;
+    padding: 15px 0;
+    transition: background-color 0.3s;
+}
+
+    .news-item:hover {
+        background-color: rgba(0, 123, 255, 0.05);
+    }
+
+    .news-item:last-child {
+        border-bottom: none;
+    }
+
+    .news-item h6 {
+        color: #1e3c72;
+        font-weight: 700;
+        margin-bottom: 5px;
+        font-size: 1rem;
+    }
+
+    .news-item p {
+        color: #6c757d;
+        font-size: 0.9rem;
+        margin-bottom: 0;
+        line-height: 1.4;
+    }
+
+    .news-item i {
+        color: #2a5298;
+        font-size: 1.2rem;
+        margin-right: 12px;
+        min-width: 24px;
+        text-align: center;
+    }
+
+/* Стили для карточек статистики */
+.stats-section .card {
+    border-radius: 10px;
+    overflow: hidden;
+    transition: transform 0.3s, box-shadow 0.3s;
+    height: 100%;
+    min-height: 140px;
+}
+
+    .stats-section .card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+    }
+
+.stats-section .card-body {
+    padding: 15px;
+}
+
+.stats-section .card i {
+    margin-bottom: 5px;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+}
+
+.stats-section .card h3 {
+    font-size: 2rem;
+    font-weight: 700;
+    margin: 5px 0;
+}
+
+.stats-section .card h6 {
+    font-size: 0.9rem;
+    opacity: 0.9;
+    letter-spacing: 0.5px;
+    margin-bottom: 0;
+}

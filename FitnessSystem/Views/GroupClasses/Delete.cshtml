@@ -1,0 +1,47 @@
+﻿@model FitnessSystem.Models.GroupClass
+
+@{
+    ViewData["Title"] = "Удаление занятия";
+}
+
+<h1>Удаление группового занятия</h1>
+
+<div class="alert alert-danger">
+    <h3>Вы уверены, что хотите удалить это занятие?</h3>
+</div>
+
+<div>
+    <hr />
+    <dl class="row">
+        <dt class="col-sm-3">Название</dt>
+        <dd class="col-sm-9">@Model.Name</dd>
+
+        <dt class="col-sm-3">Инструктор</dt>
+        <dd class="col-sm-9">@Model.Instructor</dd>
+
+        <dt class="col-sm-3">День недели</dt>
+        <dd class="col-sm-9">@Model.DayOfWeek</dd>
+
+        <dt class="col-sm-3">Время</dt>
+        <dd class="col-sm-9">@Model.StartTime.ToString(@"hh\:mm") - @Model.EndTime.ToString(@"hh\:mm")</dd>
+
+        <dt class="col-sm-3">Зал</dt>
+        <dd class="col-sm-9">@Model.Room</dd>
+
+        <dt class="col-sm-3">Макс. участников</dt>
+        <dd class="col-sm-9">@Model.MaxParticipants</dd>
+
+        <dt class="col-sm-3">Описание</dt>
+        <dd class="col-sm-9">@(string.IsNullOrEmpty(Model.Description) ? "Нет" : Model.Description)</dd>
+    </dl>
+
+    <form asp-action="Delete">
+        <input type="hidden" asp-for="Id" />
+        <button type="submit" class="btn btn-danger">
+            <i class="bi bi-trash"></i> Удалить
+        </button>
+        <a asp-action="Index" class="btn btn-secondary">
+            <i class="bi bi-arrow-left"></i> Назад
+        </a>
+    </form>
+</div>

@@ -1,0 +1,103 @@
+﻿@model IEnumerable<FitnessSystem.Models.GroupClass>
+
+@{
+    ViewData["Title"] = "Групповые занятия";
+    var bookingsCounts = ViewBag.BookingsCounts as Dictionary<int, int> ?? new Dictionary<int, int>();
+}
+
+<h1>Групповые занятия</h1>
+
+<p>
+    <a asp-action="Create" class="btn btn-primary">
+        <i class="bi bi-plus-circle"></i> Добавить занятие
+    </a>
+    <a asp-action="Schedule" class="btn btn-info">
+        <i class="bi bi-calendar-week"></i> Посмотреть расписание
+    </a>
+</p>
+
+<div class="mb-3">
+    <div class="btn-group" role="group">
+        <a asp-action="Index" asp-route-dayOfWeek="" class="btn btn-outline-secondary @(string.IsNullOrEmpty(ViewData["CurrentDay"]?.ToString()) ? "active" : "")">Все</a>
+        <a asp-action="Index" asp-route-dayOfWeek="Понедельник" class="btn btn-outline-secondary @(ViewData["CurrentDay"]?.ToString() == "Понедельник" ? "active" : "")">Пн</a>
+        <a asp-action="Index" asp-route-dayOfWeek="Вторник" class="btn btn-outline-secondary @(ViewData["CurrentDay"]?.ToString() == "Вторник" ? "active" : "")">Вт</a>
+        <a asp-action="Index" asp-route-dayOfWeek="Среда" class="btn btn-outline-secondary @(ViewData["CurrentDay"]?.ToString() == "Среда" ? "active" : "")">Ср</a>
+        <a asp-action="Index" asp-route-dayOfWeek="Четверг" class="btn btn-outline-secondary @(ViewData["CurrentDay"]?.ToString() == "Четверг" ? "active" : "")">Чт</a>
+        <a asp-action="Index" asp-route-dayOfWeek="Пятница" class="btn btn-outline-secondary @(ViewData["CurrentDay"]?.ToString() == "Пятница" ? "active" : "")">Пт</a>
+        <a asp-action="Index" asp-route-dayOfWeek="Суббота" class="btn btn-outline-secondary @(ViewData["CurrentDay"]?.ToString() == "Суббота" ? "active" : "")">Сб</a>
+        <a asp-action="Index" asp-route-dayOfWeek="Воскресенье" class="btn btn-outline-secondary @(ViewData["CurrentDay"]?.ToString() == "Воскресенье" ? "active" : "")">Вс</a>
+    </div>
+</div>
+
+@if (Model != null && Model.Any())
+{
+    <table class="table table-striped table-hover">
+        <thead class="table-primary">
+            <tr>
+                <th>Название</th>
+                <th>Инструктор</th>
+                <th>День недели</th>
+                <th>Время</th>
+                <th>Зал</th>
+                <th>Участников</th>
+                <th>Записей</th>
+                <th>Статус</th>
+                <th>Действия</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                var bookingsCount = bookingsCounts.ContainsKey(item.Id) ? bookingsCounts[item.Id] : 0;
+
+                <tr>
+                    <td class="fw-bold">@item.Name</td>
+                    <td>@item.Instructor</td>
+                    <td>@item.DayOfWeek</td>
+                    <td>@item.StartTime.ToString(@"hh\:mm") - @item.EndTime.ToString(@"hh\:mm")</td>
+                    <td>@item.Room</td>
+                    <td>
+                        <span class="badge bg-info">@item.MaxParticipants</span>
+                    </td>
+                    <td>
+                        <span class="badge @(bookingsCount >= item.MaxParticipants ? "bg-danger" : "bg-success")">
+                            @bookingsCount / @item.MaxParticipants
+                        </span>
+                    </td>
+                    <td>
+                        @if (item.IsActive)
+                        {
+                            <span class="badge bg-success">Активно</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-secondary">Неактивно</span>
+                        }
+                    </td>
+                    <td>
+                        <div class="btn-group" role="group">
+                            <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-info" title="Просмотр">
+                                <i class="bi bi-eye"></i>
+                            </a>
+                            <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-warning" title="Редактировать">
+                                <i class="bi bi-pencil"></i>
+                            </a>
+                            <a asp-action="ManageBookings" asp-route-id="@item.Id" class="btn btn-sm btn-primary" title="Управление записями">
+                                <i class="bi bi-people"></i>
+                            </a>
+                            <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-sm btn-danger" title="Удалить">
+                                <i class="bi bi-trash"></i>
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <div class="alert alert-info">
+        <i class="bi bi-info-circle"></i> Нет групповых занятий. Добавьте первое занятие!
+    </div>
+}

@@ -1,0 +1,187 @@
+﻿@model FitnessSystem.Models.GroupClassesReportViewModel
+
+@{
+    ViewData["Title"] = "Отчет по групповым занятиям";
+}
+
+<h1>Отчет по групповым занятиям</h1>
+
+<div class="card mb-4">
+    <div class="card-header bg-primary text-white">
+        <h5 class="mb-0">Параметры отчета</h5>
+    </div>
+    <div class="card-body">
+        <form method="get" class="row">
+            <div class="col-md-4">
+                <label class="form-label">Дата начала</label>
+                <input type="date" name="startDate" class="form-control" value="@Model.StartDate.ToString("yyyy-MM-dd")" />
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">Дата окончания</label>
+                <input type="date" name="endDate" class="form-control" value="@Model.EndDate.ToString("yyyy-MM-dd")" />
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">&nbsp;</label>
+                <button type="submit" class="btn btn-primary d-block">Сформировать отчет</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header bg-success text-white">
+                <h5 class="mb-0">Популярность занятий</h5>
+            </div>
+            <div class="card-body">
+                <canvas id="classesChart" style="max-height: 300px;"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header bg-info text-white">
+                <h5 class="mb-0">Популярность инструкторов</h5>
+            </div>
+            <div class="card-body">
+                <canvas id="instructorsChart" style="max-height: 300px;"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">Рейтинг занятий</h5>
+            </div>
+            <div class="card-body">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Занятие</th>
+                            <th>Количество записей</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model.PopularityByClass.OrderByDescending(x => x.Value))
+                        {
+                            <tr>
+                                <td>@item.Key</td>
+                                <td>
+                                    <span class="badge bg-success">@item.Value</span>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">Рейтинг инструкторов</h5>
+            </div>
+            <div class="card-body">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Инструктор</th>
+                            <th>Количество записей</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model.PopularityByInstructor.OrderByDescending(x => x.Value))
+                        {
+                            <tr>
+                                <td>@item.Key</td>
+                                <td>
+                                    <span class="badge bg-info">@item.Value</span>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="mt-3">
+    <a asp-action="Index" class="btn btn-secondary">Назад к отчетам</a>
+    <button onclick="window.print()" class="btn btn-outline-primary">
+        <i class="bi bi-printer"></i> Печать
+    </button>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // График популярности занятий
+            const classesCtx = document.getElementById('classesChart').getContext('2d');
+            const classLabels = @Html.Raw(Json.Serialize(Model.PopularityByClass.Keys));
+            const classData = @Html.Raw(Json.Serialize(Model.PopularityByClass.Values));
+
+            new Chart(classesCtx, {
+                type: 'bar',
+                data: {
+                    labels: classLabels,
+                    datasets: [{
+                        label: 'Количество записей',
+                        data: classData,
+                        backgroundColor: 'rgba(75, 192, 192, 0.8)',
+                        borderColor: 'rgb(75, 192, 192)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                stepSize: 1
+                            }
+                        }
+                    }
+                }
+            });
+
+            // График популярности инструкторов
+            const instructorsCtx = document.getElementById('instructorsChart').getContext('2d');
+            const instructorLabels = @Html.Raw(Json.Serialize(Model.PopularityByInstructor.Keys));
+            const instructorData = @Html.Raw(Json.Serialize(Model.PopularityByInstructor.Values));
+
+            new Chart(instructorsCtx, {
+                type: 'bar',
+                data: {
+                    labels: instructorLabels,
+                    datasets: [{
+                        label: 'Количество записей',
+                        data: instructorData,
+                        backgroundColor: 'rgba(153, 102, 255, 0.8)',
+                        borderColor: 'rgb(153, 102, 255)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                stepSize: 1
+                            }
+                        }
+                    }
+                }
+            });
+        });
+    </script>
+}
