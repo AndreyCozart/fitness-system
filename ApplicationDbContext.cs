@@ -1,4 +1,4 @@
-﻿using FitnessSystem.Models;
+using FitnessSystem.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace FitnessSystem.Data
@@ -14,6 +14,10 @@ namespace FitnessSystem.Data
         public DbSet<MembershipType> MembershipTypes { get; set; }
         public DbSet<Membership> Memberships { get; set; }
         public DbSet<Visit> Visits { get; set; }
+        public DbSet<GroupClass> GroupClasses { get; set; }
+        public DbSet<GroupClassBooking> GroupClassBookings { get; set; }
+        public DbSet<User> Users { get; set; }
+        public DbSet<LogEntry> LogEntries { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
