@@ -1,5 +1,3 @@
-﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -39,12 +37,11 @@ namespace FitnessSystem.Models
 
         [DataType(DataType.Date)]
         [Display(Name = "Дата регистрации")]
-        public DateTime RegistrationDate { get; set; } = DateTime.Now;
+        public DateTime RegistrationDate { get; set; } = DateTime.UtcNow;
 
         [Display(Name = "Примечания")]
         public string? Notes { get; set; }
 
-        // Вычисляемые поля
         [NotMapped]
         [Display(Name = "ФИО")]
         public string FullName => $"{LastName} {FirstName} {MiddleName}".Trim();
@@ -55,14 +52,13 @@ namespace FitnessSystem.Models
         {
             get
             {
-                var today = DateTime.Today;
+                var today = DateTime.UtcNow.Date;
                 var age = today.Year - BirthDate.Year;
                 if (BirthDate.Date > today.AddYears(-age)) age--;
                 return age;
             }
         }
 
-        // Навигационные свойства
         public virtual ICollection<Membership> Memberships { get; set; } = new List<Membership>();
         public virtual ICollection<Visit> Visits { get; set; } = new List<Visit>();
     }
