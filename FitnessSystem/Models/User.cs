@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 
 namespace FitnessSystem.Models
 {
@@ -12,12 +12,9 @@ namespace FitnessSystem.Models
         [Required]
         public string Password { get; set; } = string.Empty;
 
-        public string Role { get; set; } = "User"; // Admin или User
-
+        public string Role { get; set; } = "User";
         public bool IsActive { get; set; } = true;
-
-        public DateTime CreatedAt { get; set; } = DateTime.Now;
-
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public DateTime? LastLoginAt { get; set; }
     }
 }
