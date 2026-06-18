@@ -2,8 +2,6 @@ using FitnessSystem.Data;
 using Microsoft.EntityFrameworkCore;
 using FitnessSystem.Models;
 
-AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
-
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -11,7 +9,7 @@ builder.Services.AddControllersWithViews();
 
 // Добавляем DbContext для работы с базой данных
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 // Добавляем сессии для авторизации
 builder.Services.AddDistributedMemoryCache();

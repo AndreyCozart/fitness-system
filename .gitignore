@@ -1,37 +1,3 @@
-# Visual Studio
 .vs/
-*.user
-*.suo
-*.userosscache
-*.sln.docstates
-
-# Build results
-[Dd]ebug/
-[Dd]ebugPublic/
-[Rr]elease/
-[Rr]eleases/
-x64/
-x86/
-[Aa]pp_Data/
-bld/
-[Bb]in/
-[Oo]bj/
-[Ll]og/
-
-# Database files (ВАЖНО!)
-*.mdf
-*.ldf
-*.sqlite
-*.db
-
-# User-specific files
-appsettings.Development.json
-
-# NuGet
-*.nupkg
-**/packages/*
-!**/packages/build/
-
-# Other
-*.cache
-*.log
+bin/
+obj/
