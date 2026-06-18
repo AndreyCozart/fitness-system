@@ -1,5 +1,3 @@
-﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -19,7 +17,7 @@ namespace FitnessSystem.Models
 
         [DataType(DataType.Date)]
         [Display(Name = "Дата начала")]
-        public DateTime StartDate { get; set; } = DateTime.Today;
+        public DateTime StartDate { get; set; } = DateTime.UtcNow.Date;
 
         [DataType(DataType.Date)]
         [Display(Name = "Дата окончания")]
@@ -29,16 +27,15 @@ namespace FitnessSystem.Models
         public int VisitsRemaining { get; set; }
 
         [Display(Name = "Статус")]
-        public string Status { get; set; } = "active"; // active, expired, frozen
+        public string Status { get; set; } = "active";
 
         [Display(Name = "Дней заморозки")]
         public int FreezeDays { get; set; }
 
         [DataType(DataType.DateTime)]
         [Display(Name = "Дата покупки")]
-        public DateTime PurchaseDate { get; set; } = DateTime.Now;
+        public DateTime PurchaseDate { get; set; } = DateTime.UtcNow;
 
-        // Навигационные свойства
         [ForeignKey("ClientId")]
         public virtual Client? Client { get; set; }
 
@@ -47,18 +44,19 @@ namespace FitnessSystem.Models
 
         public virtual ICollection<Visit> Visits { get; set; } = new List<Visit>();
 
-        // Вычисляемые поля
         [NotMapped]
-        public bool IsActive => Status == "active" && EndDate >= DateTime.Today && (Type?.VisitsCount == null || VisitsRemaining > 0);
+        public bool IsActive => Status == "active"
+            && EndDate >= DateTime.UtcNow.Date
+            && (Type?.VisitsCount == null || VisitsRemaining > 0);
 
         [NotMapped]
-        public bool IsExpired => Status == "expired" || EndDate < DateTime.Today;
+        public bool IsExpired => Status == "expired" || EndDate < DateTime.UtcNow.Date;
 
         [NotMapped]
         public bool IsFrozen => Status == "frozen";
 
         [NotMapped]
         [Display(Name = "Дней до окончания")]
-        public int DaysUntilExpiry => (EndDate - DateTime.Today).Days;
+        public int DaysUntilExpiry => (EndDate - DateTime.UtcNow.Date).Days;
     }
 }
