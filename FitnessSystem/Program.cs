@@ -49,7 +49,7 @@ using (var scope = app.Services.CreateScope())
     var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
 
     // Ïðèìåíÿåì âñå îæèäàþùèå ìèãðàöèè
-    dbContext.Database.Migrate();
+    dbContext.Database.EnsureCreated();
 
     // Äîáàâëÿåì òåñòîâîãî àäìèíèñòðàòîðà, åñëè åãî íåò
     if (!dbContext.Users.Any())
