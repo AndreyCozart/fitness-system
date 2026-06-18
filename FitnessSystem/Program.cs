@@ -7,11 +7,11 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
-// Äîáàâëÿåì DbContext äëÿ ðàáîòû ñ áàçîé äàííûõ
+// Добавляем DbContext для работы с базой данных
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-// Äîáàâëÿåì ñåññèè äëÿ àâòîðèçàöèè
+// Добавляем сессии для авторизации
 builder.Services.AddDistributedMemoryCache();
 builder.Services.AddSession(options =>
 {
@@ -20,7 +20,7 @@ builder.Services.AddSession(options =>
     options.Cookie.IsEssential = true;
 });
 
-// Äîáàâëÿåì HttpContextAccessor äëÿ ïîëó÷åíèÿ IP àäðåñà
+// Добавляем HttpContextAccessor для получения IP адреса
 builder.Services.AddHttpContextAccessor();
 
 var app = builder.Build();
@@ -38,32 +38,35 @@ app.UseRouting();
 app.UseAuthorization();
 app.UseSession();
 
-// Èçìåíÿåì ìàðøðóòèçàöèþ òàê, ÷òîáû ñíà÷àëà îòêðûâàëàñü ñòðàíèöà âõîäà
+// Маршрутизация — сначала открывается страница входа
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Account}/{action=Login}/{id?}"); // Áûëî Home/Index, òåïåðü Account/Login
+    pattern: "{controller=Account}/{action=Login}/{id?}");
 
-// Èíèöèàëèçàöèÿ áàçû äàííûõ íà÷àëüíûìè äàííûìè
+// Инициализация базы данных
 using (var scope = app.Services.CreateScope())
 {
     var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
 
-    // Ïðèìåíÿåì âñå îæèäàþùèå ìèãðàöèè
+    // Создаём таблицы если их нет (без миграций)
     dbContext.Database.EnsureCreated();
 
-    // Äîáàâëÿåì òåñòîâîãî àäìèíèñòðàòîðà, åñëè åãî íåò
+    // Добавляем администратора если его нет
     if (!dbContext.Users.Any())
     {
         dbContext.Users.Add(new User
         {
             Username = "admin",
-            Password = "admin123", // Â ðåàëüíîì ïðîåêòå íóæíî õåøèðîâàòü!
+            Password = "admin123",
             Role = "Admin",
             IsActive = true,
             CreatedAt = DateTime.Now
         });
         dbContext.SaveChanges();
     }
+
+    // Заполняем базу тестовыми данными
+    DbInitializer.Initialize(dbContext);
 }
 
 app.Run();
