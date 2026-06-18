@@ -2,6 +2,9 @@ using FitnessSystem.Data;
 using Microsoft.EntityFrameworkCore;
 using FitnessSystem.Models;
 
+// Это ОБЯЗАТЕЛЬНО должно быть первой строкой — до всего остального
+AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
+
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllersWithViews();
